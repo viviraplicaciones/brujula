@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brújula</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f0f0;
+    }
+    .compass {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border: 10px solid #333;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .needle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 140px;
+      background: red;
+      transform-origin: bottom center;
+      transform: translateX(-50%) translateY(-100%);
+      transition: transform 0.5s ease-out;
+    }
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      background: #333;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="compass">
+    <div class="needle" id="needle"></div>
+    <div class="center"></div>
+  </div>
+
+  <script>
+    // Función para actualizar la rotación de la aguja
+    function updateCompass(angle) {
+      const needle = document.getElementById('needle');
+      needle.style.transform = `translateX(-50%) translateY(-100%) rotate(${angle}deg)`;
+    }
+
+    // Verificamos si el dispositivo soporta la API de DeviceOrientation
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', function(event) {
+        // 'alpha' representa la rotación alrededor del eje z en grados
+        let angle = event.alpha;
+        updateCompass(angle);
+      }, true);
+    } else {
+      // Si no hay sensor de orientación, se simula la rotación
+      let angle = 0;
+      setInterval(() => {
+        angle = (angle + 1) % 360;
+        updateCompass(angle);
+      }, 30);
+    }
+  </script>
+</body>
+</html>
