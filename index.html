@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brújula con grados</title>
+  <title>Brújula con grados y líneas cada 15°</title>
   <style>
     body {
       margin: 0;
@@ -24,6 +24,7 @@
       background: #fff;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
       margin-bottom: 20px;
+      overflow: hidden;
     }
     .needle {
       position: absolute;
@@ -35,6 +36,7 @@
       transform-origin: bottom center;
       transform: translateX(-50%) translateY(-100%);
       transition: transform 0.5s ease-out;
+      z-index: 2;
     }
     .center {
       position: absolute;
@@ -45,6 +47,25 @@
       background: #333;
       border-radius: 50%;
       transform: translate(-50%, -50%);
+      z-index: 3;
+    }
+    .ticks {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .tick {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 15px;
+      background: #333;
+      transform-origin: bottom center;
     }
     .degrees {
       font-size: 24px;
@@ -54,6 +75,7 @@
 </head>
 <body>
   <div class="compass">
+    <div class="ticks" id="ticks"></div>
     <div class="needle" id="needle"></div>
     <div class="center"></div>
   </div>
@@ -67,6 +89,20 @@
       needle.style.transform = `translateX(-50%) translateY(-100%) rotate(${angle}deg)`;
       degreeText.textContent = `${Math.round(angle)}°`;
     }
+
+    // Generar ticks cada 15° dentro de la brújula
+    function createTicks() {
+      const ticksContainer = document.getElementById('ticks');
+      for (let i = 0; i < 360; i += 15) {
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        // Rotamos y trasladamos la marca para situarla en el perímetro
+        tick.style.transform = `rotate(${i}deg) translate(0, -130px)`;
+        ticksContainer.appendChild(tick);
+      }
+    }
+
+    createTicks();
 
     // Verificamos si el dispositivo soporta la API de DeviceOrientation
     if (window.DeviceOrientationEvent) {
@@ -86,4 +122,5 @@
   </script>
 </body>
 </html>
+
  
