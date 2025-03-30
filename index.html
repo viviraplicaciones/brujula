@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brújula con números y direcciones en negrilla</title>
+  <title>PWA Brújula</title>
+  <!-- Enlace al manifiesto -->
+  <link rel="manifest" href="manifest.json">
+  <!-- Color de la barra de estado -->
+  <meta name="theme-color" content="#000000">
   <style>
+    /* Estilos para la página y la brújula */
     body {
       margin: 0;
       background: #000;
@@ -130,7 +135,7 @@
       degreeText.textContent = `${Math.round(angle)}°`;
     }
 
-    // Generar ticks cada 15° con su número y, en caso de ser dirección principal, la letra en negrilla
+    // Generar ticks cada 15° con su número y, si es dirección principal, la letra en negrilla
     function createTicks() {
       const ticksContainer = document.getElementById('ticks');
       for (let i = 0; i < 360; i += 15) {
@@ -149,7 +154,7 @@
         const numberLabel = document.createElement('div');
         numberLabel.className = 'tick-number';
         numberLabel.textContent = i;
-        // Se rota inversamente para mantener la orientación horizontal
+        // Rotación inversa para mantener la orientación horizontal
         numberLabel.style.transform = `translateX(-50%) rotate(-${i}deg)`;
         tickContainer.appendChild(numberLabel);
 
@@ -168,20 +173,33 @@
 
     createTicks();
 
-    // Verificamos si el dispositivo soporta la API de DeviceOrientation
+    // Actualiza la brújula usando la API DeviceOrientation o simula la rotación
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', function(event) {
-        // 'alpha' representa la rotación alrededor del eje z en grados
         let angle = event.alpha;
         updateCompass(angle);
       }, true);
     } else {
-      // Si no hay sensor de orientación, se simula la rotación
       let angle = 0;
       setInterval(() => {
         angle = (angle + 1) % 360;
         updateCompass(angle);
       }, 30);
+    }
+  </script>
+
+  <!-- Registro del Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+         navigator.serviceWorker.register('service-worker.js')
+         .then(registration => {
+            console.log('Service Worker registrado con éxito:', registration);
+         })
+         .catch(error => {
+            console.error('Error al registrar el Service Worker:', error);
+         });
+      });
     }
   </script>
 </body>

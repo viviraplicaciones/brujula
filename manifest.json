@@ -1,0 +1,26 @@
+const CACHE_NAME = 'pwa-compass-cache-v1';
+const urlsToCache = [
+  './index.html',
+  './manifest.json',
+  './icono.png'
+  // Agrega aquí otros recursos que desees cachear, por ejemplo, archivos CSS o JS adicionales.
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Caché abierto');
+        return cache.addAll(urlsToCache);
+      })
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      })
+  );
+});
