@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brújula con grados y líneas cada 15°</title>
+  <title>Brújula con líneas en el borde y números pequeños</title>
   <style>
     body {
       margin: 0;
@@ -36,7 +36,7 @@
       transform-origin: bottom center;
       transform: translateX(-50%) translateY(-100%);
       transition: transform 0.5s ease-out;
-      z-index: 2;
+      z-index: 3;
     }
     .center {
       position: absolute;
@@ -47,8 +47,9 @@
       background: #333;
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      z-index: 3;
+      z-index: 4;
     }
+    /* Contenedor de ticks */
     .ticks {
       position: absolute;
       top: 0;
@@ -56,16 +57,34 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 1;
+      z-index: 2;
     }
-    .tick {
+    /* Cada contenedor de tick se posiciona en el centro y se rota, luego se traslada al borde */
+    .tick-container {
       position: absolute;
       top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      /* Se traslada hacia arriba para situarse en el borde (radio aprox. 150 - 10 = 140px) */
+    }
+    /* Línea (tick) */
+    .tick {
+      position: absolute;
+      bottom: 0;
       left: 50%;
       width: 2px;
       height: 15px;
       background: #333;
-      transform-origin: bottom center;
+      transform: translateX(-50%);
+    }
+    /* Etiqueta del tick */
+    .tick-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      color: #333;
+      font-size: 10px;
+      transform-origin: center;
     }
     .degrees {
       font-size: 24px;
@@ -90,15 +109,30 @@
       degreeText.textContent = `${Math.round(angle)}°`;
     }
 
-    // Generar ticks cada 15° dentro de la brújula
+    // Generar ticks cada 15° y sus etiquetas numéricas
     function createTicks() {
       const ticksContainer = document.getElementById('ticks');
       for (let i = 0; i < 360; i += 15) {
+        // Contenedor para cada tick y etiqueta
+        const tickContainer = document.createElement('div');
+        tickContainer.className = 'tick-container';
+        // Se rota según el ángulo y se traslada hacia el borde interior (140px desde el centro)
+        tickContainer.style.transform = `rotate(${i}deg) translate(0, -140px)`;
+
+        // Línea del tick
         const tick = document.createElement('div');
         tick.className = 'tick';
-        // Rotamos y trasladamos la marca para situarla en el perímetro
-        tick.style.transform = `rotate(${i}deg) translate(0, -130px)`;
-        ticksContainer.appendChild(tick);
+        tickContainer.appendChild(tick);
+
+        // Etiqueta con el número
+        const label = document.createElement('div');
+        label.className = 'tick-label';
+        label.textContent = i;
+        // Se rota en sentido inverso para que se mantenga horizontal
+        label.style.transform = `translateX(-50%) rotate(-${i}deg)`;
+        tickContainer.appendChild(label);
+
+        ticksContainer.appendChild(tickContainer);
       }
     }
 
@@ -122,5 +156,3 @@
   </script>
 </body>
 </html>
-
- 
