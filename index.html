@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brújula con líneas en el borde y números pequeños</title>
+  <title>Brújula con números y direcciones en negrilla</title>
   <style>
     body {
       margin: 0;
+      background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background: #f0f0f0;
       font-family: Arial, sans-serif;
     }
     .compass {
@@ -59,15 +59,14 @@
       pointer-events: none;
       z-index: 2;
     }
-    /* Cada contenedor de tick se posiciona en el centro y se rota, luego se traslada al borde */
+    /* Contenedor para cada tick y etiquetas */
     .tick-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform-origin: center center;
-      /* Se traslada hacia arriba para situarse en el borde (radio aprox. 150 - 10 = 140px) */
     }
-    /* Línea (tick) */
+    /* Línea del tick */
     .tick {
       position: absolute;
       bottom: 0;
@@ -77,18 +76,28 @@
       background: #333;
       transform: translateX(-50%);
     }
-    /* Etiqueta del tick */
-    .tick-label {
+    /* Etiqueta para el número */
+    .tick-number {
       position: absolute;
       bottom: -20px;
       left: 50%;
-      color: #333;
       font-size: 10px;
+      color: #333;
+      transform-origin: center;
+    }
+    /* Etiqueta para la dirección (letra) en negrilla */
+    .tick-direction {
+      position: absolute;
+      bottom: -35px;
+      left: 50%;
+      font-size: 10px;
+      color: #333;
+      font-weight: bold;
       transform-origin: center;
     }
     .degrees {
       font-size: 24px;
-      color: #333;
+      color: #fff;
     }
   </style>
 </head>
@@ -101,6 +110,18 @@
   <div class="degrees" id="degreeText">0°</div>
 
   <script>
+    // Mapeo de ángulos a direcciones en español
+    const directions = {
+      0: 'N',
+      45: 'NE',
+      90: 'E',
+      135: 'SE',
+      180: 'S',
+      225: 'SO',
+      270: 'O',
+      315: 'NO'
+    };
+
     // Función para actualizar la rotación de la aguja y el texto de grados
     function updateCompass(angle) {
       const needle = document.getElementById('needle');
@@ -109,14 +130,14 @@
       degreeText.textContent = `${Math.round(angle)}°`;
     }
 
-    // Generar ticks cada 15° y sus etiquetas numéricas
+    // Generar ticks cada 15° con su número y, en caso de ser dirección principal, la letra en negrilla
     function createTicks() {
       const ticksContainer = document.getElementById('ticks');
       for (let i = 0; i < 360; i += 15) {
-        // Contenedor para cada tick y etiqueta
+        // Contenedor para cada tick y etiquetas
         const tickContainer = document.createElement('div');
         tickContainer.className = 'tick-container';
-        // Se rota según el ángulo y se traslada hacia el borde interior (140px desde el centro)
+        // Se rota y se traslada al borde interior (aprox. 140px desde el centro)
         tickContainer.style.transform = `rotate(${i}deg) translate(0, -140px)`;
 
         // Línea del tick
@@ -124,13 +145,22 @@
         tick.className = 'tick';
         tickContainer.appendChild(tick);
 
-        // Etiqueta con el número
-        const label = document.createElement('div');
-        label.className = 'tick-label';
-        label.textContent = i;
-        // Se rota en sentido inverso para que se mantenga horizontal
-        label.style.transform = `translateX(-50%) rotate(-${i}deg)`;
-        tickContainer.appendChild(label);
+        // Etiqueta con el número (siempre se muestra)
+        const numberLabel = document.createElement('div');
+        numberLabel.className = 'tick-number';
+        numberLabel.textContent = i;
+        // Se rota inversamente para mantener la orientación horizontal
+        numberLabel.style.transform = `translateX(-50%) rotate(-${i}deg)`;
+        tickContainer.appendChild(numberLabel);
+
+        // Si el ángulo corresponde a una dirección, se añade la etiqueta con la letra
+        if (directions[i] !== undefined) {
+          const directionLabel = document.createElement('div');
+          directionLabel.className = 'tick-direction';
+          directionLabel.textContent = directions[i];
+          directionLabel.style.transform = `translateX(-50%) rotate(-${i}deg)`;
+          tickContainer.appendChild(directionLabel);
+        }
 
         ticksContainer.appendChild(tickContainer);
       }
